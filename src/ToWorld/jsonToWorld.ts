@@ -17,7 +17,7 @@ function ConvertObjectToNode(json: Object) {
     let v = values[i];
     if (v instanceof Array<string>) {
       for(let j=0;j<v.length;++j){
-        if(v.at(j) && keys.find(e => e !== v.at(j))){
+        if(v.at(j) && !keys.find(e => e === v.at(j))){
           return new Error(`One of the child ${v[j]} is not present among keys of json`);
         }
       } 
@@ -46,7 +46,7 @@ function generateWorldFromJSON(canvas: HTMLCanvasElement,json: Object) {
   const NodesElem: Map<string,CircularElem> = new Map();
   nodes.forEach(node => {
     const render = renderCircularElem(1, 'grey', 'black', node.name);
-    const elem = new CircularElem(100+50*Math.random(), 100, 50 + 50*Math.random(), 50, false, 10, render);
+    const elem = new CircularElem(100+50*Math.random(), 100+50*Math.random(), 50 , 50, false, 10, render);
     NodesElem.set(node.name,elem);
   });
   const elems = [...NodesElem.values()];
