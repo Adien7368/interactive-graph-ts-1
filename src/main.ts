@@ -31,7 +31,6 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 let ctx = canvas.getContext('2d');
 if (canvas !== null && ctx !== null) {
-  debugger;
   const render = renderCircularElem(1, 'grey', 'black', 'no_name');
 
   const render4 = renderCircularElem(1, 'grey', 'black', 'no_name6');
