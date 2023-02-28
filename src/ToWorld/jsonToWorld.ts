@@ -38,7 +38,7 @@ function ConvertObjectToNode(json: Object) {
   return result;
 }
 
-function generateWorldFromJSON(canvas: HTMLCanvasElement,json: Object) {
+function generateWorldFromJSON(json: Object) {
   
   const constraint: Array<Constraint> = [];
   const nodes = ConvertObjectToNode(json);
@@ -59,9 +59,8 @@ function generateWorldFromJSON(canvas: HTMLCanvasElement,json: Object) {
       constraint.push(cons);
     }
   }));
-
-  const world = new World(canvas,elems,constraint);
-  return world;
+  return (canvas: HTMLCanvasElement) => new World(canvas, elems, constraint);
+  
 }
 
 export { generateWorldFromJSON, ConvertObjectToNode };

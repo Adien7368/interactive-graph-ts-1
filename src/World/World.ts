@@ -8,7 +8,7 @@ class World extends WorldGlabalValues {
   ) {
     super(canvas);
   }
-  runApp(): void {
+  run(): void {
     let ctx = this.canvas.getContext('2d');
     if (ctx === null) return;
     let startAnimation = (ctx: CanvasRenderingContext2D) => {
