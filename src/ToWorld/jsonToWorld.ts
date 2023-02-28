@@ -75,7 +75,7 @@ function generateWorldFromJSON(json: Object, filter: Filter,repelForce?: number)
  
   nodes.forEach(node => {
     const render = renderCircularElem(1, 'grey', 'black', node.name);
-    const elem = new CircularElem(100+50*Math.random(), 100+50*Math.random(), 50 , 50, false, 10, render);
+    const elem = new CircularElem(100+(100*Math.random() -50), 100+(100*Math.random()-50), 100 , 100, false, 10, render);
     NodesElem.set(node.name,elem);
   });
   const elems = [...NodesElem.values()];
