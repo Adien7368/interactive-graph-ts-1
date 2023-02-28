@@ -1,4 +1,5 @@
 import { CircularElem, renderCircularElem } from "../World/CircularElem";
+import { Constraint } from "../World/Contraint";
 import { LineContraint, renderEdges } from "../World/LineContraint";
 import { World } from "../World/World";
 
