@@ -1,6 +1,6 @@
-import { generateWorldFromJSON } from './ToWorld/jsonToWorld';
+import { Filter, generateWorldFromJSON } from './ToWorld/jsonToWorld';
 
-function getFilter() {
+function getFilter(): Filter {
   let whitelist = document.getElementById('whitelist');
   let blacklist = document.getElementById('blacklist');
   if (
