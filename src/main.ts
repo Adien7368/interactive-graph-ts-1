@@ -41,8 +41,8 @@ function run() {
       throw fn;
     } else {
       let canvas = document.createElement('canvas');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.width = document.body.clientWidth;
+      canvas.height = document.body.clientHeight;
       let card = <HTMLElement>document.getElementById('card');
       card.remove();
       document.body.appendChild(canvas);

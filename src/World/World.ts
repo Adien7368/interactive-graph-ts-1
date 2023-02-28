@@ -5,6 +5,7 @@ import { Elem } from '../World/Elem';
 import { WorldGlabalValues } from '../World/Global';
 
 class World extends WorldGlabalValues {
+  public mousePinned: Array<Elem> = [];
   constructor(
     public canvas: HTMLCanvasElement,
     public elems: Array<Elem>,
@@ -15,19 +16,25 @@ class World extends WorldGlabalValues {
     super(canvas, repelForce);
 
     canvas.addEventListener('mousedown', (event) => {
-      this.elems.forEach((elem) =>
-        elem.mouseDown(event.clientX, event.clientY)
-      );
+      let rect = canvas.getBoundingClientRect();
+      this.elems.forEach((elem) => {
+        if (
+          elem.mouseDown(event.clientX - rect.left, event.clientY - rect.top)
+        ) {
+          this.mousePinned.push(elem);
+        }
+      });
     });
 
     canvas.addEventListener('mousemove', (event) => {
-      this.elems.forEach((elem) =>
-        elem.mouseMove(event.clientX, event.clientY)
+      let rect = canvas.getBoundingClientRect();
+      this.mousePinned.forEach((elem) =>
+        elem.mouseMove(event.clientX - rect.left, event.clientY - rect.top)
       );
     });
 
     canvas.addEventListener('mouseup', () => {
-      this.elems.forEach((elem) => elem.mouseUp());
+      this.mousePinned.forEach((elem) => elem.mouseUp());
     });
   }
 

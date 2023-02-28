@@ -28,7 +28,9 @@ class CircularElem implements Elem {
   mouseDown(mouseX: number, mouseY: number) {
     if (this.isCoOrdinateInside(mouseX, mouseY)) {
       this.mousePinned = true;
+      return true;
     }
+    return false;
   }
 
   mouseMove(mouseX: number, mouseY: number) {
