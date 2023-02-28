@@ -50,19 +50,20 @@ class World extends WorldGlabalValues {
             secondElement instanceof CircularElem &&
             !secondElement.isPinned()
           ) {
-            let dis = distance(firstElement, secondElement);
+            let dis = distance(firstElement, secondElement) + 0.001;
+
             ///  first <- second
             let force = {
               x: (firstElement.x - secondElement.x) / dis,
               y: (firstElement.y - secondElement.y) / dis,
             };
             firstElement.applyForce(
-              force.x * this.allElemRepelEachOther,
-              force.y * this.allElemRepelEachOther
+              (force.x * this.allElemRepelEachOther) / 2,
+              (force.y * this.allElemRepelEachOther) / 2
             );
             secondElement.applyForce(
-              -1 * force.x * this.allElemRepelEachOther,
-              -1 * force.y * this.allElemRepelEachOther
+              (-1 * force.x * this.allElemRepelEachOther) / 2,
+              (-1 * force.y * this.allElemRepelEachOther) / 2
             );
           }
         }

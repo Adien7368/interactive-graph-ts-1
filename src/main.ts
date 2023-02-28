@@ -36,7 +36,7 @@ function run() {
   try {
     let json: Object = JSON.parse(elem.value);
 
-    const fn = generateWorldFromJSON(json, filter, 0.1);
+    const fn = generateWorldFromJSON(json, filter, 0.01);
     if (fn instanceof Error) {
       throw fn;
     } else {
