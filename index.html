@@ -49,9 +49,8 @@
       <div class="card-body">
         <h5 class="card-title">Enter a json here</h5>
         <p class="card-text">
-          Make sure its in this format <br />
-
-          Ex: <br />
+          Make sure its in this format: { string: [string] } <br />
+          <b>Example:</b> <br />
           <code>
             { "a" : ["b", "c"] <br />, "b" : [] <br />, "c" : []<br />
             }
@@ -60,7 +59,38 @@
 
         <div class="form-group mb-2">
           <label for="input"> Enter JSON here </label>
-          <textarea class="form-control my-3" id="input" rows="15"></textarea>
+          <textarea class="form-control my-3" id="input" rows="12"></textarea>
+          <label for="input">
+            <b>WhiteList or BlackList Nodes here</b> <br />
+            Ex: <br />
+            Make Sure its in this format: [string] | Regex <br />
+            <code> ["a", "b"] </code> or <code> ^(a|b)$</code>
+          </label>
+          <br />
+
+          <div class="btn-group btn-group-toggle mt-2" data-toggle="buttons">
+            <label class="btn btn-secondary active">
+              <input
+                type="radio"
+                name="options"
+                id="whitelist"
+                autocomplete="off"
+                checked
+              />
+              Whitelist
+            </label>
+            <label class="btn btn-secondary">
+              <input
+                type="radio"
+                name="options"
+                id="blacklist"
+                autocomplete="off"
+              />
+              Blacklist
+            </label>
+          </div>
+
+          <textarea class="form-control my-3" id="list" rows="1"></textarea>
           <a class="btn btn-primary" id="submit">Generate</a>
         </div>
       </div>

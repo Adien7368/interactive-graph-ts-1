@@ -36,10 +36,13 @@ class World extends WorldGlabalValues {
 
     for (let i = 0; i < this.elems.length; ++i) {
       let firstElement = this.elems[i];
-      if (firstElement instanceof CircularElem) {
+      if (firstElement instanceof CircularElem && !firstElement.isPinned()) {
         for (let j = i + 1; j < this.elems.length; ++j) {
           let secondElement = this.elems[j];
-          if (secondElement instanceof CircularElem) {
+          if (
+            secondElement instanceof CircularElem &&
+            !secondElement.isPinned()
+          ) {
             let dis = distance(firstElement, secondElement);
             ///  first <- second
             let force = {

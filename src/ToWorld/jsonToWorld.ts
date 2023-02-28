@@ -39,12 +39,40 @@ function ConvertObjectToNode(json: Object) {
   return result;
 }
 
-function generateWorldFromJSON(json: Object, repelForce?: number) {
+type Filter = {
+  mode: 'whitelist', list: Array<string> | RegExp
+} | {
+  mode: 'blacklist', list: Array<string> | RegExp
+}
+function checkFilter(str: string,filter: Filter){
+  let invert = filter.mode == 'whitelist'? true:false;
+  if(filter.list instanceof Array){
+      let ans = filter.list.find(e => e == str)?true:false;
+      return invert? ans: !ans;
+    } else {
+      let ans = filter.list.test(str);
+      return invert ? ans : !ans;
+    }
+   
+}
+
+function filterNodes(nodes: Array<Node>,filter : Filter): Array<Node> {
+  nodes = nodes.filter(node => checkFilter(node.name, filter));
+  const filteredNode = nodes.map(node => {
+    let newChild = node.children.filter(child => nodes.find(n => n.name == child));
+    return {name: node.name, children: newChild};
+  });
+  return filteredNode;
+}
+
+function generateWorldFromJSON(json: Object, filter: Filter,repelForce?: number) {
   
   const constraint: Array<Constraint> = [];
-  const nodes = ConvertObjectToNode(json);
-  if(nodes instanceof Error) return nodes;
+  const generatedNode = ConvertObjectToNode(json);
+  if(generatedNode instanceof Error) return generatedNode;
+  const nodes = filterNodes(generatedNode, filter);
   const NodesElem: Map<string,CircularElem> = new Map();
+ 
   nodes.forEach(node => {
     const render = renderCircularElem(1, 'grey', 'black', node.name);
     const elem = new CircularElem(100+50*Math.random(), 100+50*Math.random(), 50 , 50, false, 10, render);
@@ -56,7 +84,7 @@ function generateWorldFromJSON(json: Object, repelForce?: number) {
     let elem1 = NodesElem.get(node.name);
     let elem2 = NodesElem.get(child);
     if( elem1 && elem2){
-      const cons = new LineContraint(elem1,elem2 , 100, 0.5, lineRender);
+      const cons = new LineContraint(elem1,elem2 , 200, 0.01, lineRender);
       constraint.push(cons);
     } 
   })); 
@@ -64,4 +92,4 @@ function generateWorldFromJSON(json: Object, repelForce?: number) {
   
 }
 
-export { generateWorldFromJSON, ConvertObjectToNode };
+export { generateWorldFromJSON, ConvertObjectToNode , type Filter};
