@@ -1,13 +1,5 @@
+import { distance, distance_sq } from '../utils';
 import { Elem } from '../World/Elem';
-
-function distance_sq(
-  p1: { x: number; y: number },
-  p2: { x: number; y: number }
-) {
-  let dx = p1.x - p2.x;
-  let dy = p1.y - p2.y;
-  return dx * dx + dy * dy;
-}
 
 class CircularElem implements Elem {
   mousePinned: boolean = false;
@@ -24,6 +16,8 @@ class CircularElem implements Elem {
     ) => void,
     public friction: number = 0.99
   ) {}
+
+  isPinned: () => boolean = () => this.pinned || this.mousePinned;
 
   isCoOrdinateInside(x: number, y: number) {
     let dis = distance_sq(this, { x, y });
@@ -91,6 +85,15 @@ class CircularElem implements Elem {
     if (Math.abs(this.y - this.oldy) > 30) {
       this.oldy = 30 - this.y + this.oldy;
     }
+  }
+
+  applyForce(fx: number, fy: number) {
+    this.x += fx;
+    this.y += fy;
+  }
+
+  distanceFrom(x: number, y: number): number {
+    return distance(this, { x: x, y: y });
   }
   render(ctx: CanvasRenderingContext2D) {
     this.renderOverride(ctx, this);

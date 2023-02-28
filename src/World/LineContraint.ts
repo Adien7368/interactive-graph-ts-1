@@ -1,12 +1,7 @@
+import { distance } from '../utils';
 import { CircularElem } from '../World/CircularElem';
 import { Constraint } from '../World/Contraint';
 import { Elem } from '../World/Elem';
-
-function distance(p1: { x: number; y: number }, p2: { x: number; y: number }) {
-  let dx = p1.x - p2.x;
-  let dy = p1.y - p2.y;
-  return Math.sqrt(dx * dx + dy * dy);
-}
 
 class LineContraint implements Constraint {
   elems: Array<Elem> = [];
@@ -31,11 +26,11 @@ class LineContraint implements Constraint {
     let dy = this.elem1_pointer.y - this.elem2_pointer.y;
     let offsetX = (this.elasticity * dl * dx) / (2 * currDistance);
     let offsetY = (this.elasticity * dl * dy) / (2 * currDistance);
-    if (!this.elem1_pointer.pinned && !this.elem1_pointer.mousePinned) {
+    if (!this.elem1_pointer.isPinned()) {
       this.elem1_pointer.x -= offsetX;
       this.elem1_pointer.y -= offsetY;
     }
-    if (!this.elem2_pointer.pinned && !this.elem1_pointer.mousePinned) {
+    if (!this.elem2_pointer.isPinned()) {
       this.elem2_pointer.x += offsetX;
       this.elem2_pointer.y += offsetY;
     }

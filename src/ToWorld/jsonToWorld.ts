@@ -39,7 +39,7 @@ function ConvertObjectToNode(json: Object) {
   return result;
 }
 
-function generateWorldFromJSON(json: Object) {
+function generateWorldFromJSON(json: Object, repelForce?: number) {
   
   const constraint: Array<Constraint> = [];
   const nodes = ConvertObjectToNode(json);
@@ -58,9 +58,9 @@ function generateWorldFromJSON(json: Object) {
     if( elem1 && elem2){
       const cons = new LineContraint(elem1,elem2 , 100, 0.5, lineRender);
       constraint.push(cons);
-    }
-  }));
-  return (canvas: HTMLCanvasElement) => new World(canvas, elems, constraint);
+    } 
+  })); 
+  return (canvas: HTMLCanvasElement) => new World(canvas, elems, constraint, repelForce);
   
 }
 
