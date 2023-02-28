@@ -1,3 +1,5 @@
+import { Constraint } from '../World/Contraint';
+import { Elem } from '../World/Elem';
 import { WorldGlabalValues } from '../World/Global';
 
 class World extends WorldGlabalValues {
@@ -7,7 +9,23 @@ class World extends WorldGlabalValues {
     public constraint: Array<Constraint>
   ) {
     super(canvas);
+    canvas.addEventListener('mousedown', (event) => {
+      this.elems.forEach((elem) =>
+        elem.mouseDown(event.clientX, event.clientY)
+      );
+    });
+
+    canvas.addEventListener('mousemove', (event) => {
+      this.elems.forEach((elem) =>
+        elem.mouseMove(event.clientX, event.clientY)
+      );
+    });
+
+    canvas.addEventListener('mouseup', () => {
+      this.elems.forEach((elem) => elem.mouseUp());
+    });
   }
+
   run(): void {
     let ctx = this.canvas.getContext('2d');
     if (ctx === null) return;

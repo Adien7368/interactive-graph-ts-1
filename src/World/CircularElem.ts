@@ -1,4 +1,16 @@
-class CircularElem {
+import { Elem } from '../World/Elem';
+
+function distance_sq(
+  p1: { x: number; y: number },
+  p2: { x: number; y: number }
+) {
+  let dx = p1.x - p2.x;
+  let dy = p1.y - p2.y;
+  return dx * dx + dy * dy;
+}
+
+class CircularElem implements Elem {
+  mousePinned: boolean = false;
   constructor(
     public x: number,
     public y: number,
@@ -12,8 +24,32 @@ class CircularElem {
     ) => void,
     public friction: number = 0.99
   ) {}
+
+  isCoOrdinateInside(x: number, y: number) {
+    let dis = distance_sq(this, { x, y });
+
+    return dis < 2 * this.radius * this.radius;
+  }
+
+  mouseDown(mouseX: number, mouseY: number) {
+    if (this.isCoOrdinateInside(mouseX, mouseY)) {
+      this.mousePinned = true;
+    }
+  }
+
+  mouseMove(mouseX: number, mouseY: number) {
+    if (this.mousePinned) {
+      this.x = this.oldx = mouseX;
+      this.y = this.oldy = mouseY;
+    }
+  }
+
+  mouseUp() {
+    this.mousePinned = false;
+  }
+
   update(width: number, height: number): void {
-    if (this.pinned) return;
+    if (this.pinned || this.mousePinned) return;
     let dx = this.x - this.oldx;
     let dy = this.y - this.oldy;
     this.oldx = this.x;
