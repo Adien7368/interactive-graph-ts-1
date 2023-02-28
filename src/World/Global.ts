@@ -5,7 +5,7 @@ class WorldGlabalValues {
   constructor(
     public canvas: HTMLCanvasElement,
     repelForce: false | number,
-    public friction: number = 0.5
+    public friction: number = 0.1
   ) {
     this.width = canvas.width;
     this.height = canvas.height;

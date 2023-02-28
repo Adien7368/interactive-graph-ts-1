@@ -71,6 +71,7 @@ function generateWorldFromJSON(json: Object, filter: Filter,repelForce?: number)
   const generatedNode = ConvertObjectToNode(json);
   if(generatedNode instanceof Error) return generatedNode;
   const nodes = filterNodes(generatedNode, filter);
+  console.log("Filtered Node",nodes);
   const NodesElem: Map<string,CircularElem> = new Map();
  
   nodes.forEach(node => {
@@ -85,7 +86,7 @@ function generateWorldFromJSON(json: Object, filter: Filter,repelForce?: number)
     let elem1 = NodesElem.get(node.name);
     let elem2 = NodesElem.get(child);
     if( elem1 && elem2){
-      const cons = new LineContraint(elem1,elem2 , 200, 0.01, lineRender);
+      const cons = new LineContraint(elem1,elem2 , 100, 0.001, lineRender);
       constraint.push(cons);
     } 
   })); 

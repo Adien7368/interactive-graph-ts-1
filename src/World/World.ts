@@ -50,7 +50,7 @@ class World extends WorldGlabalValues {
             secondElement instanceof CircularElem &&
             !secondElement.isPinned()
           ) {
-            let dis = distance(firstElement, secondElement) + 0.001;
+            let dis = distance(firstElement, secondElement) + 1;
 
             ///  first <- second
             let force = {
