@@ -4,10 +4,12 @@ function getFilter(): Filter {
   let whitelist = <HTMLInputElement>document.getElementById('whitelist');
   let blacklist = <HTMLInputElement>document.getElementById('blacklist');
   if (whitelist.checked || blacklist.checked) {
-    let filterContent = (<HTMLInputElement>document.getElementById('list'))
-      .value;
-    let pinnedContent = (<HTMLInputElement>document.getElementById('pinned'))
-      .value;
+    let filterContent = (<HTMLInputElement>(
+      document.getElementById('list')
+    )).value.replace(/'/g, '"');
+    let pinnedContent = (<HTMLInputElement>(
+      document.getElementById('pinned')
+    )).value.replace(/'/g, '"');
     let list: Array<string> | RegExp = [];
     let pinnedList: Array<string> | RegExp = [];
 
