@@ -50,7 +50,8 @@ function run() {
       world.run();
     }
   } catch (e) {
-    alert('Error, check console');
+    if (e instanceof Error) alert('Error, ' + e.message);
+    else alert('Error, check console');
     console.error(e);
   }
 }
