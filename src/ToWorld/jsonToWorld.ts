@@ -6,8 +6,52 @@ import { World } from "../World/World";
 
 type Node = {
   name: string;
+  pinned: boolean;
   children: Array<string>;
 };
+
+type Filter = {
+  mode: 'whitelist', list: Array<string> | RegExp, pinnedList : Array<string> | RegExp
+} | {
+  mode: 'blacklist', list: Array<string> | RegExp, pinnedList : Array<string> | RegExp
+}
+
+function generateWorldFromJSON(json: Object, filter: Filter,repelForce?: number) {
+  
+  const constraint: Array<Constraint> = [];
+  const generatedNode = ConvertObjectToNode(json);
+  if(generatedNode instanceof Error) return generatedNode;
+
+  const nodes = filterNodes(generatedNode, filter);
+  console.log("Filtered Node",nodes);
+  const NodesElem: Map<string,CircularElem> = new Map();
+ 
+  nodes.forEach(node => {
+    if(node.pinned) {
+    const render = renderCircularElem(1, 'white', 'grey', node.name);
+    const elem = new CircularElem(100+(100*Math.random() -50), 100+(100*Math.random()-50), 100 , 100, true, 15, render);
+    NodesElem.set(node.name,elem);
+  } else {
+    const render = renderCircularElem(1, 'grey', 'black', node.name);
+    const elem = new CircularElem(100+(100*Math.random() -50), 100+(100*Math.random()-50), 100 , 100, false, 15, render);
+    NodesElem.set(node.name,elem);
+  }
+  });
+  
+  const elems = [...NodesElem.values()];
+  nodes.forEach(node => node.children.forEach(child => {
+    const lineRender = renderEdges('black', 1);
+    let elem1 = NodesElem.get(node.name);
+    let elem2 = NodesElem.get(child);
+    if( elem1 && elem2){
+      const cons = new LineContraint(elem1,elem2 , 100, 0.001, lineRender);
+      constraint.push(cons);
+    } 
+  })); 
+  return (canvas: HTMLCanvasElement) => new World(canvas, elems, constraint, repelForce);
+  
+}
+
 
 function ConvertObjectToNode(json: Object) {
   const keys = Object.keys(json);
@@ -32,18 +76,16 @@ function ConvertObjectToNode(json: Object) {
   for(let i=0;i<keys.length;++i){
     const node: Node = {
       name: keys[i],
+      pinned: false,
       children: children[i]
     };
     result.push(node);
   }
+
   return result;
 }
 
-type Filter = {
-  mode: 'whitelist', list: Array<string> | RegExp
-} | {
-  mode: 'blacklist', list: Array<string> | RegExp
-}
+
 function checkFilter(str: string,filter: Filter){
   let invert = filter.mode == 'whitelist'? true:false;
   if(filter.list instanceof Array){
@@ -60,38 +102,15 @@ function filterNodes(nodes: Array<Node>,filter : Filter): Array<Node> {
   nodes = nodes.filter(node => checkFilter(node.name, filter));
   const filteredNode = nodes.map(node => {
     let newChild = node.children.filter(child => nodes.find(n => n.name == child));
-    return {name: node.name, children: newChild};
+    let pinned = false;
+    if(filter.pinnedList instanceof Array)
+      pinned = filter.pinnedList.find(e => e === node.name)?true:false;
+    else
+      pinned = filter.pinnedList.test(node.name);
+    return {name: node.name, pinned, children: newChild};
   });
   return filteredNode;
 }
 
-function generateWorldFromJSON(json: Object, filter: Filter,repelForce?: number) {
-  
-  const constraint: Array<Constraint> = [];
-  const generatedNode = ConvertObjectToNode(json);
-  if(generatedNode instanceof Error) return generatedNode;
-  const nodes = filterNodes(generatedNode, filter);
-  console.log("Filtered Node",nodes);
-  const NodesElem: Map<string,CircularElem> = new Map();
- 
-  nodes.forEach(node => {
-    const render = renderCircularElem(1, 'grey', 'black', node.name);
-    const elem = new CircularElem(100+(100*Math.random() -50), 100+(100*Math.random()-50), 100 , 100, false, 10, render);
-    NodesElem.set(node.name,elem);
-  });
-  
-  const elems = [...NodesElem.values()];
-  nodes.forEach(node => node.children.forEach(child => {
-    const lineRender = renderEdges('black', 1);
-    let elem1 = NodesElem.get(node.name);
-    let elem2 = NodesElem.get(child);
-    if( elem1 && elem2){
-      const cons = new LineContraint(elem1,elem2 , 100, 0.001, lineRender);
-      constraint.push(cons);
-    } 
-  })); 
-  return (canvas: HTMLCanvasElement) => new World(canvas, elems, constraint, repelForce);
-  
-}
 
 export { generateWorldFromJSON, ConvertObjectToNode , type Filter};

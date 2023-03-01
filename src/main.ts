@@ -1,31 +1,39 @@
 import { Filter, generateWorldFromJSON } from './ToWorld/jsonToWorld';
 
 function getFilter(): Filter {
-  let whitelist = document.getElementById('whitelist');
-  let blacklist = document.getElementById('blacklist');
-  if (
-    whitelist instanceof HTMLInputElement &&
-    blacklist instanceof HTMLInputElement &&
-    (whitelist.checked || blacklist.checked)
-  ) {
+  let whitelist = <HTMLInputElement>document.getElementById('whitelist');
+  let blacklist = <HTMLInputElement>document.getElementById('blacklist');
+  if (whitelist.checked || blacklist.checked) {
     let filterContent = (<HTMLInputElement>document.getElementById('list'))
       .value;
+    let pinnedContent = (<HTMLInputElement>document.getElementById('pinned'))
+      .value;
     let list: Array<string> | RegExp = [];
+    let pinnedList: Array<string> | RegExp = [];
+
     try {
       list = JSON.parse(filterContent);
-      if (!(list instanceof Array)) throw new Error('list is not Array');
+      if (!(list instanceof Array)) throw new Error('filterlist is not Array');
     } catch (e) {
       console.error(e);
       list = new RegExp(filterContent);
     }
 
+    try {
+      pinnedList = JSON.parse(pinnedContent);
+      if (!(list instanceof Array)) throw new Error('pinnedlist is not Array');
+    } catch (e) {
+      console.error(e);
+      pinnedList = new RegExp(pinnedContent);
+    }
+
     if (whitelist.checked) {
-      return { mode: 'whitelist', list };
+      return { mode: 'whitelist', list, pinnedList };
     } else {
-      return { mode: 'blacklist', list };
+      return { mode: 'blacklist', list, pinnedList };
     }
   } else {
-    return { mode: 'whitelist', list: [] };
+    return { mode: 'whitelist', list: [], pinnedList: [] };
   }
 }
 
