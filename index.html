@@ -38,13 +38,27 @@
     <script type="module">
       import { run } from '/src/main.ts';
       window.onload = function () {
-        document.getElementById('submit').onclick = run;
+        document.getElementById('submit').onclick = function () {
+          localStorage.json = document.getElementById('input').value;
+          localStorage.filterlist = document.getElementById('list').value;
+          localStorage.pinned = document.getElementById('pinned').value;
+          run();
+        };
+        document.getElementById('input').value = localStorage.json
+          ? localStorage.json
+          : '';
+        document.getElementById('list').value = localStorage.filterlist
+          ? localStorage.filterlist
+          : '';
+        document.getElementById('pinned').value = localStorage.pinned
+          ? localStorage.pinned
+          : '';
       };
     </script>
   </head>
 
-  <body class="p-4">
-    <div class="card" id="card">
+  <body>
+    <div class="card m-3" id="card">
       <div class="card-header">Interactive Graph</div>
       <div class="card-body">
         <h5 class="card-title">Enter a json here</h5>
