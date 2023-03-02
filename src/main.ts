@@ -32,7 +32,8 @@ function getFilter(): Filter {
 
     try {
       pinnedList = JSON.parse(pinnedContent);
-      if (!(list instanceof Array)) throw new Error('pinnedlist is not Array');
+      if (!(pinnedList instanceof Array))
+        throw new Error('pinnedlist is not Array');
     } catch (e) {
       console.error(e);
       pinnedList = new RegExp(pinnedContent == '' ? '\b' : pinnedContent);

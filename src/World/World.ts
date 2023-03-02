@@ -3,6 +3,7 @@ import { CircularElem } from '../World/CircularElem';
 import { Constraint } from '../World/Contraint';
 import { Elem } from '../World/Elem';
 import { WorldGlabalValues } from '../World/Global';
+import { LineContraint } from '../World/LineContraint';
 
 class World extends WorldGlabalValues {
   public mousePinned: Elem | undefined;
@@ -20,6 +21,18 @@ class World extends WorldGlabalValues {
         if (this.mousePinned) {
           this.mousePinned.mouseUp();
           this.elems = this.elems.filter((e) => e != this.mousePinned);
+          this.constraint = this.constraint.filter((c) => {
+            if (
+              c instanceof LineContraint &&
+              this.mousePinned instanceof CircularElem
+            ) {
+              return (
+                c.elem1_pointer !== this.mousePinned &&
+                this.mousePinned !== c.elem2_pointer
+              );
+            }
+            return true;
+          });
         }
       }
     });
