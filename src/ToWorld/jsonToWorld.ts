@@ -11,13 +11,13 @@ type Node = {
 };
 
 type Filter = {
-  mode: 'whitelist', list: Array<string> | RegExp, pinnedList : Array<string> | RegExp
+  mode: 'whitelist', list: Array<string> | RegExp, pinnedList : Array<string> | RegExp, includeNthChild: number
 } | {
-  mode: 'blacklist', list: Array<string> | RegExp, pinnedList : Array<string> | RegExp
+  mode: 'blacklist', list: Array<string> | RegExp, pinnedList : Array<string> | RegExp, includeNthChild: number
 }
 
 function generateWorldFromJSON(json: Object, filter: Filter,repelForce?: number) {
-  
+  console.log("Filter : ",filter);
   const constraint: Array<Constraint> = [];
   const generatedNode = ConvertObjectToNode(json);
   if(generatedNode instanceof Error) return generatedNode;
@@ -99,8 +99,12 @@ function checkFilter(str: string,filter: Filter){
 }
 
 function filterNodes(nodes: Array<Node>,filter : Filter): Array<Node> {
-  nodes = nodes.filter(node => checkFilter(node.name, filter));
-  const filteredNode = nodes.map(node => {
+  let filteredNodes = nodes.filter(node => checkFilter(node.name, filter));
+
+  
+  filteredNodes = addNthChild(filteredNodes, nodes, filter.includeNthChild)
+
+  const result = filteredNodes.map(node => {
     let newChild = node.children.filter(child => nodes.find(n => n.name == child));
     let pinned = false;
     if(filter.pinnedList instanceof Array)
@@ -109,7 +113,35 @@ function filterNodes(nodes: Array<Node>,filter : Filter): Array<Node> {
       pinned = filter.pinnedList.test(node.name);
     return {name: node.name, pinned, children: newChild};
   });
-  return filteredNode;
+
+  return result;
+}
+
+function addNthChild(filteredNodes: Array<Node>, allNodes: Array<Node>, nthChild: number): Array<Node>{
+  const result: Set<string> = new Set();
+  filteredNodes.forEach(n => result.add(n.name));
+
+  const map:Map<string,Node> = new Map();
+  allNodes.forEach(n => map.set(n.name, n));
+  
+  for(let i=0;i<nthChild;++i){
+    const arr = Array.from(result.values());
+    arr.forEach(m =>{
+      const po = map.get(m);
+      if(po){
+        po.children.forEach(c => result.add(c))
+      }
+    }) 
+  }
+  const filteredList = Array.from(result.values());
+  let ans = [];
+  for(let i =0;i<filteredList.length ;++i){
+    let node = map.get(filteredList[i]);
+    if(node){
+      ans.push(node);
+    }
+  }
+  return  ans;
 }
 
 function pathFinder(nodes: Array<Node>){

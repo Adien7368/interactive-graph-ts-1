@@ -7,6 +7,7 @@ import {
 function getFilter(): Filter {
   let whitelist = <HTMLInputElement>document.getElementById('whitelist');
   let blacklist = <HTMLInputElement>document.getElementById('blacklist');
+  let nthChild = <HTMLSelectElement>document.getElementById('nthchild');
   if (whitelist.checked || blacklist.checked) {
     let filterContent = (<HTMLInputElement>(
       document.getElementById('list')
@@ -34,14 +35,20 @@ function getFilter(): Filter {
         pinnedContent.trim() == '' ? '\b' : pinnedContent
       );
     }
+    let includeNthChild: number = 0;
+    try {
+      includeNthChild = parseInt(nthChild.value);
+    } catch (e) {
+      includeNthChild = 0;
+    }
 
     if (whitelist.checked) {
-      return { mode: 'whitelist', list, pinnedList };
+      return { mode: 'whitelist', list, pinnedList, includeNthChild };
     } else {
-      return { mode: 'blacklist', list, pinnedList };
+      return { mode: 'blacklist', list, pinnedList, includeNthChild };
     }
   } else {
-    return { mode: 'whitelist', list: [], pinnedList: [] };
+    return { mode: 'whitelist', list: [], pinnedList: [], includeNthChild: 0 };
   }
 }
 
