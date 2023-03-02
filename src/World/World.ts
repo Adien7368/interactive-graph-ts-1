@@ -5,7 +5,7 @@ import { Elem } from '../World/Elem';
 import { WorldGlabalValues } from '../World/Global';
 
 class World extends WorldGlabalValues {
-  public mousePinned: Array<Elem> = [];
+  public mousePinned: Elem | undefined;
   constructor(
     public canvas: HTMLCanvasElement,
     public elems: Array<Elem>,
@@ -15,26 +15,40 @@ class World extends WorldGlabalValues {
     if (repelForce === undefined) repelForce = false;
     super(canvas, repelForce);
 
+    window.addEventListener('keydown', (event) => {
+      if (event.code == 'KeyD') {
+        if (this.mousePinned) {
+          this.mousePinned.mouseUp();
+          this.elems = this.elems.filter((e) => e != this.mousePinned);
+        }
+      }
+    });
+
     canvas.addEventListener('mousedown', (event) => {
       let rect = canvas.getBoundingClientRect();
       this.elems.forEach((elem) => {
+        if (this.mousePinned) return;
         if (
           elem.mouseDown(event.clientX - rect.left, event.clientY - rect.top)
         ) {
-          this.mousePinned.push(elem);
+          this.mousePinned = elem;
         }
       });
     });
 
     canvas.addEventListener('mousemove', (event) => {
-      let rect = canvas.getBoundingClientRect();
-      this.mousePinned.forEach((elem) =>
-        elem.mouseMove(event.clientX - rect.left, event.clientY - rect.top)
-      );
+      if (this.mousePinned) {
+        let rect = canvas.getBoundingClientRect();
+        this.mousePinned.mouseMove(
+          event.clientX - rect.left,
+          event.clientY - rect.top
+        );
+      }
     });
 
     canvas.addEventListener('mouseup', () => {
-      this.mousePinned.forEach((elem) => elem.mouseUp());
+      if (this.mousePinned) this.mousePinned.mouseUp();
+      this.mousePinned = undefined;
     });
   }
 

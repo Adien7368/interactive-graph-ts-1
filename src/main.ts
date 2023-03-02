@@ -11,10 +11,14 @@ function getFilter(): Filter {
   if (whitelist.checked || blacklist.checked) {
     let filterContent = (<HTMLInputElement>(
       document.getElementById('list')
-    )).value.replace(/'/g, '"');
+    )).value
+      .replace(/'/g, '"')
+      .trim();
     let pinnedContent = (<HTMLInputElement>(
       document.getElementById('pinned')
-    )).value.replace(/'/g, '"');
+    )).value
+      .replace(/'/g, '"')
+      .trim();
     let list: Array<string> | RegExp = [];
     let pinnedList: Array<string> | RegExp = [];
 
@@ -23,7 +27,7 @@ function getFilter(): Filter {
       if (!(list instanceof Array)) throw new Error('filterlist is not Array');
     } catch (e) {
       console.error(e);
-      list = new RegExp(filterContent.trim() == '' ? '.*' : filterContent);
+      list = new RegExp(filterContent == '' ? '.*' : filterContent);
     }
 
     try {
@@ -31,9 +35,7 @@ function getFilter(): Filter {
       if (!(list instanceof Array)) throw new Error('pinnedlist is not Array');
     } catch (e) {
       console.error(e);
-      pinnedList = new RegExp(
-        pinnedContent.trim() == '' ? '\b' : pinnedContent
-      );
+      pinnedList = new RegExp(pinnedContent == '' ? '\b' : pinnedContent);
     }
     let includeNthChild: number = 0;
     try {
