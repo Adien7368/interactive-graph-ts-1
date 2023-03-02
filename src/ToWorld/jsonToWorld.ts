@@ -112,16 +112,32 @@ function filterNodes(nodes: Array<Node>,filter : Filter): Array<Node> {
   return filteredNode;
 }
 
-function pathFinder(p1: string, p2: string, nodes: Array<Node>){
-  if(p1 == p2) return true;
-  if(!nodes.find(n => n.name == p1)) return false;
-  for(let j=0; j<nodes.length;++j){
-    if(pathFinder(nodes[j].name, p2, nodes)){
-      console.log(nodes[j].name);
-      break;
-    }
+function pathFinder(p1: string, _p2: string, nodes: Array<Node>){
+  const m: Map<string,boolean> = new Map();
+  const ans:Map<string,string> = new Map();
+
+  let nodep1 = nodes.find(n => n.name == p1);
+  if(nodep1 === undefined) return;
+  m.set(p1, true);
+  ans.set(p1, 'root');
+  let queue = [nodep1];
+  while(queue.length>0){
+    let it = <Node> queue[0];
+    it.children.forEach(child => {
+      if(!m.get(child)){
+        ans.set(it.name, child);
+        let ch = nodes.find(e => e.name == child)
+        if(ch){
+          queue.push(ch);
+        }
+      }
+
+    })
+    queue.shift();
   }
-  return false;
+
+  return Object.fromEntries(ans);
+
 }
 
 
