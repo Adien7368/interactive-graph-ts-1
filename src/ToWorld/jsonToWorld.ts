@@ -112,29 +112,14 @@ function filterNodes(nodes: Array<Node>,filter : Filter): Array<Node> {
   return filteredNode;
 }
 
-function pathFinder(p1: string, _p2: string, nodes: Array<Node>){
-  const m: Map<string,boolean> = new Map();
+function pathFinder(nodes: Array<Node>){
   const ans:Map<string,string> = new Map();
-
-  let nodep1 = nodes.find(n => n.name == p1);
-  if(nodep1 === undefined) return;
-  m.set(p1, true);
-  ans.set(p1, 'root');
-  let queue = [nodep1];
-  while(queue.length>0){
-    let it = <Node> queue[0];
-    it.children.forEach(child => {
-      if(!m.get(child)){
-        ans.set(it.name, child);
-        let ch = nodes.find(e => e.name == child)
-        if(ch){
-          queue.push(ch);
-        }
-      }
-
+  nodes.forEach(n => {
+    n.children.forEach(c => {
+      ans.set(c,n.name);
     })
-    queue.shift();
-  }
+  })
+
 
   return Object.fromEntries(ans);
 
