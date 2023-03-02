@@ -112,5 +112,17 @@ function filterNodes(nodes: Array<Node>,filter : Filter): Array<Node> {
   return filteredNode;
 }
 
+function pathFinder(p1: string, p2: string, nodes: Array<Node>){
+  if(p1 == p2) return true;
+  if(!nodes.find(n => n.name == p1)) return false;
+  for(let j=0; j<nodes.length;++j){
+    if(pathFinder(nodes[j].name, p2, nodes)){
+      console.log(nodes[j].name);
+      break;
+    }
+  }
+  return false;
+}
 
-export { generateWorldFromJSON, ConvertObjectToNode , type Filter};
+
+export { generateWorldFromJSON, ConvertObjectToNode , type Filter, pathFinder};

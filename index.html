@@ -36,7 +36,8 @@
     </style>
     <script type="module" src="/src/main.ts"></script>
     <script type="module">
-      import { run } from '/src/main.ts';
+      import { run, pathFinder } from '/src/main.ts';
+      window.pathFinder = pathFinder;
       window.onload = function () {
         document.getElementById('submit').onclick = function () {
           localStorage.json = document.getElementById('input').value;
@@ -52,7 +53,7 @@
           : '';
         document.getElementById('pinned').value = localStorage.pinned
           ? localStorage.pinned
-          : '';
+          : '[]';
       };
     </script>
   </head>
