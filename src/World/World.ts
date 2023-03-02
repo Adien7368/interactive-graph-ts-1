@@ -81,8 +81,8 @@ class World extends WorldGlabalValues {
 
             ///  first <- second
             let force = {
-              x: (firstElement.x - secondElement.x) / dis,
-              y: (firstElement.y - secondElement.y) / dis,
+              x: (firstElement.x - secondElement.x) / (dis*dis),
+              y: (firstElement.y - secondElement.y) / (dis*dis),
             };
             firstElement.applyForce(
               (force.x * this.allElemRepelEachOther) / 2,
