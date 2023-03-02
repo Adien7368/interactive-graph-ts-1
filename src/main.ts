@@ -22,7 +22,7 @@ function getFilter(): Filter {
       if (!(list instanceof Array)) throw new Error('filterlist is not Array');
     } catch (e) {
       console.error(e);
-      list = new RegExp(filterContent);
+      list = new RegExp(filterContent.trim() == '' ? '.*' : filterContent);
     }
 
     try {
@@ -30,7 +30,9 @@ function getFilter(): Filter {
       if (!(list instanceof Array)) throw new Error('pinnedlist is not Array');
     } catch (e) {
       console.error(e);
-      pinnedList = new RegExp(pinnedContent);
+      pinnedList = new RegExp(
+        pinnedContent.trim() == '' ? '\b' : pinnedContent
+      );
     }
 
     if (whitelist.checked) {
