@@ -43,24 +43,34 @@
           localStorage.json = document.getElementById('input').value;
           localStorage.filterlist = document.getElementById('list').value;
           localStorage.pinned = document.getElementById('pinned').value;
+
+          localStorage.nthchild = document.getElementById('nthchild').value;
           run();
         };
-        document.getElementById('input').value = localStorage.json
-          ? localStorage.json
-          : '';
-        document.getElementById('list').value = localStorage.filterlist
-          ? localStorage.filterlist
-          : '';
-        document.getElementById('pinned').value = localStorage.pinned
-          ? localStorage.pinned
-          : '[]';
+        if (localStorage.json)
+          document.getElementById('input').value = localStorage.json;
+
+        if (localStorage.nthchild)
+          document.getElementById('nthchild').value = localStorage.nthchild;
+
+        if (localStorage.filterlist)
+          document.getElementById('list').value = localStorage.filterlist;
+        if (localStorage.pinned)
+          document.getElementById('pinned').value = localStorage.pinned;
       };
     </script>
   </head>
 
   <body>
     <div class="card m-3" id="card">
-      <div class="card-header">Interactive Graph</div>
+      <div class="card-header">
+        <h4>Interactive Graph</h4>
+
+        <h
+          >Create a graph, which you can interact with mouse. Hold and Press D
+          to delete
+        </h>
+      </div>
       <div class="card-body">
         <h5 class="card-title">Enter a json here</h5>
         <p class="card-text">
