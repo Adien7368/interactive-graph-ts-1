@@ -108,17 +108,20 @@ function renderCircularElem(
   name: string
 ) {
   return function (ctx: CanvasRenderingContext2D, elem: CircularElem) {
+    let c = elem.pinned ? 'white' : color;
+    let s = elem.pinned ? 'grey' : stroke;
+
     ctx.beginPath();
     ctx.lineWidth = strokeWidth;
     ctx.arc(elem.x, elem.y, elem.radius, 0, 2 * Math.PI);
-    ctx.fillStyle = color;
+    ctx.fillStyle = c;
     ctx.fill();
     ctx.lineWidth = 2;
-    ctx.strokeStyle = stroke;
+    ctx.strokeStyle = s;
     ctx.stroke();
     ctx.lineWidth = 1;
 
-    ctx.fillStyle = stroke;
+    ctx.fillStyle = s;
     // if (this.showInfo || this.parmanentShowInfo) {
     ctx.font = '16px Arial';
     ctx.fillText(name, elem.x - elem.radius / 2, elem.y - 2 * elem.radius);

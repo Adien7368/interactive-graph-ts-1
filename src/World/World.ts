@@ -17,6 +17,7 @@ class World extends WorldGlabalValues {
     super(canvas, repelForce);
 
     window.addEventListener('keydown', (event) => {
+      console.log(event.code);
       if (event.code == 'KeyD') {
         if (this.mousePinned) {
           this.mousePinned.mouseUp();
@@ -33,6 +34,16 @@ class World extends WorldGlabalValues {
             }
             return true;
           });
+        }
+      } else if (event.code == 'KeyP') {
+        let elem = this.mousePinned;
+        if (elem && elem instanceof CircularElem) {
+          elem.pinned = true;
+        }
+      } else if (event.code == 'KeyU') {
+        let elem = this.mousePinned;
+        if (elem && elem instanceof CircularElem) {
+          elem.pinned = false;
         }
       }
     });
