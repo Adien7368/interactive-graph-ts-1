@@ -22,7 +22,7 @@ function generateWorldFromJSON(json: Object, filter: Filter,repelForce?: number)
   const generatedNode = ConvertObjectToNode(json);
   if(generatedNode instanceof Error) return generatedNode;
 
-  const nodes = filterNodes(generatedNode, filter);
+  const nodes = filterAndPinNodes(generatedNode, filter);
   console.log("Filtered Node",nodes);
   const NodesElem: Map<string,CircularElem> = new Map();
  
@@ -86,23 +86,9 @@ function ConvertObjectToNode(json: Object) {
 }
 
 
-function checkFilter(str: string,filter: Filter){
-  let invert = filter.mode == 'whitelist'? true:false;
-  if(filter.list instanceof Array){
-      let ans = filter.list.find(e => e == str)?true:false;
-      return invert? ans: !ans;
-    } else {
-      let ans = filter.list.test(str);
-      return invert ? ans : !ans;
-    }
-   
-}
-
-function filterNodes(nodes: Array<Node>,filter : Filter): Array<Node> {
-  let filteredNodes = nodes.filter(node => checkFilter(node.name, filter));
-
+function filterAndPinNodes(nodes: Array<Node>,filter : Filter): Array<Node> {
   
-  filteredNodes = addNthChild(filteredNodes, nodes, filter.includeNthChild)
+  let filteredNodes = filterNodes(nodes, filter);
 
   const result = filteredNodes.map(node => {
     let newChild = node.children.filter(child => nodes.find(n => n.name == child));
@@ -117,45 +103,43 @@ function filterNodes(nodes: Array<Node>,filter : Filter): Array<Node> {
   return result;
 }
 
-function addNthChild(filteredNodes: Array<Node>, allNodes: Array<Node>, nthChild: number): Array<Node>{
-  const result: Set<string> = new Set();
-  filteredNodes.forEach(n => result.add(n.name));
+function filterNodes(allnodes: Array<Node>, filter: Filter): Array<Node>{
+  let seedList = getSeedList(allnodes, filter);
+  const mapNameToNode: Map<String,Node> = new Map();
+  allnodes.forEach(n => mapNameToNode.set(n.name, n));
+  let mainListThatFilterTargets = seedList;
+  let queue = seedList;
+  for(let i = 1; i<=filter.includeNthChild;++i){
 
-  const map:Map<string,Node> = new Map();
-  allNodes.forEach(n => map.set(n.name, n));
-  
-  for(let i=0;i<nthChild;++i){
-    const arr = Array.from(result.values());
-    arr.forEach(m =>{
-      const po = map.get(m);
-      if(po){
-        po.children.forEach(c => result.add(c))
+    let nextChildren: Set<String> = new Set();
+    queue.forEach(name => {
+      let currentNode = mapNameToNode.get(name);
+      if(currentNode){
+        currentNode.children.forEach(childName => nextChildren.add(childName));
       }
-    }) 
+    });
+
+    nextChildren.forEach(n => mainListThatFilterTargets.push(n));
+    queue = Array.from(nextChildren.values());
   }
-  const filteredList = Array.from(result.values());
-  let ans = [];
-  for(let i =0;i<filteredList.length ;++i){
-    let node = map.get(filteredList[i]);
-    if(node){
-      ans.push(node);
-    }
-  }
-  return  ans;
-}
-
-function pathFinder(nodes: Array<Node>){
-  const ans:Map<string,string> = new Map();
-  nodes.forEach(n => {
-    n.children.forEach(c => {
-      ans.set(c,n.name);
-    })
-  })
-
-
-  return Object.fromEntries(ans);
-
+  return allnodes.filter(n => {
+    const result = mainListThatFilterTargets.find(c => c == n.name) ? true: false;
+    if(filter.mode == 'blacklist') return !result;
+    else return result;
+  });
 }
 
 
-export { generateWorldFromJSON, ConvertObjectToNode , type Filter, pathFinder};
+function getSeedList(allnodes: Array<Node>, filter: Filter): Array <String> {
+  let list = filter.list;
+  if(list instanceof RegExp) {
+    let t = list;// Booring
+    return allnodes.filter(n => t.test(n.name)).map(n => n.name);
+  } else {
+    return list;
+  }
+}
+
+
+
+export { generateWorldFromJSON, ConvertObjectToNode , type Filter};

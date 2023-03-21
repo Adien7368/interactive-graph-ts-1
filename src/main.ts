@@ -1,8 +1,4 @@
-import {
-  Filter,
-  generateWorldFromJSON,
-  pathFinder,
-} from './ToWorld/jsonToWorld';
+import { Filter, generateWorldFromJSON } from './ToWorld/jsonToWorld';
 
 function getFilter(): Filter {
   let whitelist = <HTMLInputElement>document.getElementById('whitelist');
@@ -81,4 +77,4 @@ function run() {
     console.error(e);
   }
 }
-export { generateWorldFromJSON, run, pathFinder };
+export { generateWorldFromJSON, run };

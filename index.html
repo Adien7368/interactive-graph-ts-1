@@ -36,8 +36,7 @@
     </style>
     <script type="module" src="/src/main.ts"></script>
     <script type="module">
-      import { run, pathFinder } from '/src/main.ts';
-      window.pathFinder = pathFinder;
+      import { run } from '/src/main.ts';
       window.onload = function () {
         document.getElementById('submit').onclick = function () {
           localStorage.json = document.getElementById('input').value;
