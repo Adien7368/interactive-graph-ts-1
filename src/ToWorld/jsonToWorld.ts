@@ -28,6 +28,7 @@ function generateWorldFromJSON(json: Object, filter: Filter,repelForce?: number)
   if(generatedNode instanceof Error) return generatedNode;
 
   const nodes = filterNodes(generatedNode, filter);
+  nodes.map(node => { node.children = node.children.filter(c => nodes.find(n => n.name == c)); return node});
   console.log("Filtered Node : ",nodes);
   const NodesElem: Map<string,CircularElem> = new Map();
  
@@ -44,12 +45,13 @@ function generateWorldFromJSON(json: Object, filter: Filter,repelForce?: number)
   });
   
   const elems = [...NodesElem.values()];
+  
   nodes.forEach(node => node.children.forEach(child => {
     const lineRender = renderEdges('black', 1);
     let elem1 = NodesElem.get(node.name);
     let elem2 = NodesElem.get(child);
     if( elem1 && elem2){
-      const cons = new LineContraint(elem1,elem2 , 100 + 6*node.children.length, 0.001, lineRender);
+      const cons = new LineContraint(elem1,elem2 , 100 + 3*node.children.length, 0.001, lineRender);
       constraint.push(cons);
     } 
   })); 
