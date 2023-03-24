@@ -2,37 +2,42 @@ import { CircularElem, renderCircularElem } from "../World/CircularElem";
 import { Constraint } from "../World/Contraint";
 import { LineContraint, renderEdges } from "../World/LineContraint";
 import { World } from "../World/World";
+import { boolean, decode, record, string, array, decodeType } from 'typescript-json-decoder';
 
+type Node = decodeType<typeof nodeDecoder>;
 
-type Node = {
-  name: string;
-  pinned: boolean;
-  children: Array<string>;
-};
+const nodeDecoder = record({
+  name: string,
+  pinned: boolean,
+  children: array(string)
+})
+
 
 type Filter = {
-  mode: 'whitelist', list: Array<string> | RegExp, pinnedList : Array<string> | RegExp, includeNthChild: number
-} | {
-  mode: 'blacklist', list: Array<string> | RegExp, pinnedList : Array<string> | RegExp, includeNthChild: number
-}
+  mode: 'whitelist' | 'blacklist', 
+  list: Array<string> | RegExp, 
+  pinnedList : Array<string> | RegExp, 
+  includeNthChild: number,
+  includeNthParent: number
+} 
 
 function generateWorldFromJSON(json: Object, filter: Filter,repelForce?: number) {
   console.log("Filter : ",filter);
   const constraint: Array<Constraint> = [];
-  const generatedNode = ConvertObjectToNode(json);
+  const generatedNode = ConvertObjectToNode(json, filter.pinnedList);
   if(generatedNode instanceof Error) return generatedNode;
 
-  const nodes = filterAndPinNodes(generatedNode, filter);
-  console.log("Filtered Node",nodes);
+  const nodes = filterNodes(generatedNode, filter);
+  console.log("Filtered Node : ",nodes);
   const NodesElem: Map<string,CircularElem> = new Map();
  
   nodes.forEach(node => {
     if(node.pinned) {
-    const render = renderCircularElem(1, 'white', 'grey', node.name);
+    const render = renderCircularElem(1, node.name);
     const elem = new CircularElem(100+(100*Math.random() -50), 100+(100*Math.random()-50), 100 , 100, true, 15, render);
     NodesElem.set(node.name,elem);
   } else {
-    const render = renderCircularElem(1, 'grey', 'black', node.name);
+    const render = renderCircularElem(1, node.name);
     const elem = new CircularElem(100+(100*Math.random() -50), 100+(100*Math.random()-50), 100 , 100, false, 15, render);
     NodesElem.set(node.name,elem);
   }
@@ -53,80 +58,16 @@ function generateWorldFromJSON(json: Object, filter: Filter,repelForce?: number)
 }
 
 
-function ConvertObjectToNode(json: Object) {
-  const keys = Object.keys(json);
-  const values = Object.values(json);
-  const children: Array<Array<string>> = [];
- 
-  for (let i = 0; i < values.length; ++i) {
-    let v = values[i];
-    if (v instanceof Array<string>) {
-      for(let j=0;j<v.length;++j){
-        if(v.at(j) && !keys.find(e => e === v.at(j))){
-          return new Error(`One of the child ${v[j]} is not present among keys of json`);
-        }
-      } 
-      children.push(v);
-    } else {
-      return new Error('Invalid JSON');
-    }
-  }
-
-  const result = [];
-  for(let i=0;i<keys.length;++i){
-    const node: Node = {
-      name: keys[i],
-      pinned: false,
-      children: children[i]
-    };
-    result.push(node);
-  }
-
-  return result;
-}
-
-
-function filterAndPinNodes(nodes: Array<Node>,filter : Filter): Array<Node> {
-  
-  let filteredNodes = filterNodes(nodes, filter);
-
-  const result = filteredNodes.map(node => {
-    let newChild = node.children.filter(child => nodes.find(n => n.name == child));
+function ConvertObjectToNode(json: Object, pinnedList: Array<string> | RegExp) {
+  return Object.entries(json).map(([key, value]) => {
     let pinned = false;
-    if(filter.pinnedList instanceof Array)
-      pinned = filter.pinnedList.find(e => e === node.name)?true:false;
-    else
-      pinned = filter.pinnedList.test(node.name);
-    return {name: node.name, pinned, children: newChild};
-  });
-
-  return result;
-}
-
-function filterNodes(allnodes: Array<Node>, filter: Filter): Array<Node>{
-  let seedList = getSeedList(allnodes, filter);
-  const mapNameToNode: Map<String,Node> = new Map();
-  allnodes.forEach(n => mapNameToNode.set(n.name, n));
-  let mainListThatFilterTargets = seedList;
-  let queue = seedList;
-  for(let i = 1; i<=filter.includeNthChild;++i){
-
-    let nextChildren: Set<String> = new Set();
-    queue.forEach(name => {
-      let currentNode = mapNameToNode.get(name);
-      if(currentNode){
-        currentNode.children.forEach(childName => nextChildren.add(childName));
-      }
-    });
-
-    nextChildren.forEach(n => mainListThatFilterTargets.push(n));
-    queue = Array.from(nextChildren.values());
-  }
-  return allnodes.filter(n => {
-    const result = mainListThatFilterTargets.find(c => c == n.name) ? true: false;
-    if(filter.mode == 'blacklist') return !result;
-    else return result;
-  });
+    if(pinnedList instanceof RegExp) {
+      pinned = pinnedList.test(key);
+    } else {
+      pinned = pinnedList.includes(key);
+    }
+    return decode(nodeDecoder)({name: key, pinned, children: value})
+  })  
 }
 
 
@@ -141,5 +82,63 @@ function getSeedList(allnodes: Array<Node>, filter: Filter): Array <String> {
 }
 
 
+function filterNodes(allnodes: Array<Node>, filter: Filter): Array<Node>{
+  const seedList: Array<String> = getSeedList(allnodes, filter);
+  const result: Set<String> = new Set(seedList);
+  // Precompute Mapping
+  const mapNameToNode: Map<String,Node> = new Map();
+  allnodes.forEach(n => mapNameToNode.set(n.name, n));
+  const parents: Map<String, Array<Node>> = new Map();
+  allnodes.forEach(n => n.children.forEach(c => {
+    let val = parents.get(c);
+    if(val) {
+      parents.set(c, val.concat([n]));
+    } else {
+      parents.set(c, [n]);
+    }
+  }));
+  console.log("Parents : ", parents);
+  // Child Nth Code
+  let queue = [...seedList];
+  for(let i = 1; i<=filter.includeNthChild;++i){
 
-export { generateWorldFromJSON, ConvertObjectToNode , type Filter};
+    let nextChildren: Set<String> = new Set();
+    queue.forEach(name => {
+      let currentNode = mapNameToNode.get(name);
+      if(currentNode){
+        currentNode.children.forEach(childName => nextChildren.add(childName));
+      }
+    });
+    
+    nextChildren.forEach(n => result.add(n));
+    queue = Array.from(nextChildren.values());
+  }
+
+
+  // Parent Nth Code
+  let parentqueue: Array<Node> = [];
+  if(filter.includeNthParent > 0){
+    seedList.forEach(n => {const t = parents.get(n); if(t)parentqueue = parentqueue.concat(t);})
+    parentqueue.forEach(p => result.add(p.name));
+  }
+  for(let i = 2; i <= filter.includeNthParent;++i){
+    let nextParents: Set<Node> = new Set();
+    parentqueue.forEach(node => {
+      const parray = parents.get(node.name);
+      if(parray) parray.forEach(node => nextParents.add(node));
+    })
+    nextParents.forEach(p => result.add(p.name));
+    parentqueue = Array.from(nextParents.values());
+  }
+
+  return allnodes.filter(n => {
+    const res = result.has(n.name) ? true: false;
+    if(filter.mode == 'blacklist') return !res;
+    else return res;
+  });
+}
+
+
+
+
+export { generateWorldFromJSON , type Filter};

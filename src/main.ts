@@ -4,6 +4,10 @@ function getFilter(): Filter {
   let whitelist = <HTMLInputElement>document.getElementById('whitelist');
   let blacklist = <HTMLInputElement>document.getElementById('blacklist');
   let nthChild = <HTMLSelectElement>document.getElementById('nthchild');
+  let nthParent = <HTMLSelectElement>document.getElementById('nthparent');
+  let includeNthChild: number = 0;
+  let includeNthParent: number = 0;
+
   if (whitelist.checked || blacklist.checked) {
     let filterContent = (<HTMLInputElement>(
       document.getElementById('list')
@@ -34,20 +38,33 @@ function getFilter(): Filter {
       console.error(e);
       pinnedList = new RegExp(pinnedContent == '' ? '\b' : pinnedContent);
     }
-    let includeNthChild: number = 0;
+
     try {
       includeNthChild = parseInt(nthChild.value);
     } catch (e) {
       includeNthChild = 0;
     }
 
-    if (whitelist.checked) {
-      return { mode: 'whitelist', list, pinnedList, includeNthChild };
-    } else {
-      return { mode: 'blacklist', list, pinnedList, includeNthChild };
+    try {
+      includeNthParent = parseInt(nthParent.value);
+    } catch (e) {
+      includeNthParent = 0;
     }
+    return {
+      mode: whitelist.checked ? 'whitelist' : 'blacklist',
+      list,
+      pinnedList,
+      includeNthChild,
+      includeNthParent,
+    };
   } else {
-    return { mode: 'whitelist', list: [], pinnedList: [], includeNthChild: 0 };
+    return {
+      mode: 'whitelist',
+      list: [],
+      pinnedList: [],
+      includeNthChild: 0,
+      includeNthParent: 0,
+    };
   }
 }
 

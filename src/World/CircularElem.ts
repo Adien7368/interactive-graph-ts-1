@@ -101,15 +101,10 @@ class CircularElem implements Elem {
     this.renderOverride(ctx, this);
   }
 }
-function renderCircularElem(
-  strokeWidth: number,
-  color: string,
-  stroke: string,
-  name: string
-) {
+function renderCircularElem(strokeWidth: number, name: string) {
   return function (ctx: CanvasRenderingContext2D, elem: CircularElem) {
-    let c = elem.pinned ? 'white' : color;
-    let s = elem.pinned ? 'grey' : stroke;
+    let c = elem.pinned ? 'white' : 'grey';
+    let s = elem.pinned ? 'grey' : 'black';
 
     ctx.beginPath();
     ctx.lineWidth = strokeWidth;
